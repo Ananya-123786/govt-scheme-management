@@ -2,7 +2,7 @@
 // Database connection settings
 $servername = "localhost";   // XAMPP default
 $username = "root";          // XAMPP default
-$password = "user@123";              // XAMPP default (usually empty)
+$password = "";              // XAMPP default (usually empty)
 $dbname = "govt_scheme";     // Make sure this matches your database name
 
 // Create connection
