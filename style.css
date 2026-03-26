@@ -1,0 +1,108 @@
+body{
+font-family: Arial, sans-serif;
+background-color:#f2f2f2;
+margin:0;
+padding:0;
+}
+
+h2{
+text-align:center;
+color:#333;
+margin-top:30px;
+}
+
+form{
+width:350px;
+margin:30px auto;
+padding:25px;
+background:white;
+border-radius:8px;
+box-shadow:0 0 10px rgba(0,0,0,0.2);
+}
+
+input, select{
+width:100%;
+padding:10px;
+margin-top:5px;
+margin-bottom:15px;
+border:1px solid #6e6666;
+border-radius:5px;
+}
+
+button{
+width:100%;
+padding:10px;
+background:#007BFF;
+color:white;
+border:none;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#0056b3;
+}
+input:focus{
+border:2px solid #007BFF;
+outline:none;
+}
+
+button{
+transition:0.3s;
+}
+
+button:hover{
+transform:scale(1.05);
+background:#0056b3;
+}
+label{
+font-weight:bold;
+}
+
+a{
+display:block;
+width:200px;
+margin:20px auto;
+padding:10px;
+background:#007BFF;
+color:white;
+text-decoration:none;
+border-radius:5px;
+font-size:16px;
+text-align:center;
+}
+
+a:hover{
+background:#0056b3;
+}
+.scheme {
+    background: #f2f2f2;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 8px;
+    display: flex;            /* use flexbox */
+    justify-content: space-between;  /* space between name/details and button */
+    align-items: center;      /* vertical alignment */
+}
+
+.scheme .apply {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    padding: 5px 10px;
+    font-weight: bold;
+}
+
+.scheme .apply:hover {
+    background-color: #45a049;
+}
+.chart-container {
+    max-width: 700px;   /* chart width */
+    margin: 0 auto;      /* center the chart */
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+}
