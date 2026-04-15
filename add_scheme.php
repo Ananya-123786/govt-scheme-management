@@ -16,11 +16,11 @@ if(isset($_POST['add_scheme'])){
     $details = $_POST['description'];
     $min_age = $_POST['min_age'];
     $max_income = $_POST['max_income'];
-
+$gender = $_POST['gender'];
     $conn->query("INSERT INTO schemes (scheme_name,description) VALUES ('$name','$details')");
     $scheme_id = $conn->insert_id;
 
-    $conn->query("INSERT INTO eligibility (scheme_id, min_age, max_income) VALUES ($scheme_id, $min_age, $max_income)");
+    $conn->query("INSERT INTO eligibility (scheme_id, min_age, max_income, gender) VALUES ($scheme_id, $min_age, $max_income, '$gender')");
     $successMsg = "Scheme added successfully!";
 }
 
@@ -31,9 +31,9 @@ if(isset($_POST['update_scheme'])){
     $details = $_POST['update_description'];
     $min_age = $_POST['update_min_age'];
     $max_income = $_POST['update_max_income'];
-
+$gender = $_POST['update_gender'];
     $conn->query("UPDATE schemes SET scheme_name='$name', description='$details' WHERE id=$id");
-    $conn->query("UPDATE eligibility SET min_age=$min_age, max_income=$max_income WHERE scheme_id=$id");
+    $conn->query("UPDATE eligibility SET min_age=$min_age, max_income=$max_income, gender='$gender' WHERE scheme_id=$id");
 
     $successMsg = "Scheme updated successfully!";
 }
@@ -47,8 +47,8 @@ if(isset($_GET['delete'])){
 }
 
 // Fetch all schemes
-$schemes = $conn->query("SELECT s.id, s.scheme_name, s.description, e.min_age, e.max_income 
-                         FROM schemes s LEFT JOIN eligibility e ON s.id = e.scheme_id");
+$schemes = $conn->query("SELECT s.id, s.scheme_name, s.description, e.min_age, e.max_income, e.gender 
+FROM schemes s LEFT JOIN eligibility e ON s.id = e.scheme_id");
 ?>
 
 <!DOCTYPE html>
@@ -90,27 +90,43 @@ $schemes = $conn->query("SELECT s.id, s.scheme_name, s.description, e.min_age, e
     <textarea name="description" placeholder="Description" rows="3" required></textarea>
     <input type="number" name="min_age" placeholder="Minimum Age" required>
     <input type="number" name="max_income" placeholder="Maximum Income" required>
+    <select name="gender" required>
+    <option value="">Select Gender</option>
+    <option value="All">All</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+</select>
     <button type="submit" name="add_scheme" class="add">Add Scheme</button>
 </form>
 
 <h2>Update Existing Scheme</h2>
 <form method="POST">
     <select name="scheme_id" id="updateSelect" required>
-        <option value="">Select Scheme</option>
-        <?php while($row = $schemes->fetch_assoc()): ?>
-            <option value="<?php echo $row['id']; ?>"
-                data-name="<?php echo htmlspecialchars($row['scheme_name']); ?>"
-                data-description="<?php echo htmlspecialchars($row['description']); ?>"
-                data-min_age="<?php echo $row['min_age']; ?>"
-                data-max_income="<?php echo $row['max_income']; ?>">
-                <?php echo $row['scheme_name']; ?>
-            </option>
-        <?php endwhile; ?>
-    </select>
+    <option value="">Select Scheme</option>
+
+    <?php while($row = $schemes->fetch_assoc()): ?>
+        <option value="<?php echo $row['id']; ?>"
+            data-name="<?php echo htmlspecialchars($row['scheme_name']); ?>"
+            data-description="<?php echo htmlspecialchars($row['description']); ?>"
+            data-min_age="<?php echo $row['min_age']; ?>"
+            data-max_income="<?php echo $row['max_income']; ?>"
+            data-gender="<?php echo isset($row['gender']) ? $row['gender'] : ''; ?>">
+            
+            <?php echo htmlspecialchars($row['scheme_name']); ?>
+        </option>
+    <?php endwhile; ?>
+
+</select>
     <input type="text" name="update_name" id="update_name" placeholder="Updated Name" required>
     <textarea name="update_description" id="update_description" placeholder="Updated Description" rows="3" required></textarea>
     <input type="number" name="update_min_age" id="update_min_age" placeholder="Minimum Age" required>
     <input type="number" name="update_max_income" id="update_max_income" placeholder="Maximum Income" required>
+    <select name="update_gender" id="update_gender" required>
+    <option value="">Select Gender</option>
+    <option value="All">All</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+</select>
     <button type="submit" name="update_scheme" class="update">Update Scheme</button>
 </form>
 
@@ -145,13 +161,14 @@ const nameInput = document.getElementById('update_name');
 const descriptionInput = document.getElementById('update_description');
 const minAgeInput = document.getElementById('update_min_age');
 const maxIncomeInput = document.getElementById('update_max_income');
-
+const genderInput = document.getElementById('update_gender');
 select.addEventListener('change', function() {
     const selected = this.options[this.selectedIndex];
     nameInput.value = selected.dataset.name || '';
     descriptionInput.value = selected.dataset.description || '';
     minAgeInput.value = selected.dataset.min_age || '';
     maxIncomeInput.value = selected.dataset.max_income || '';
+    genderInput.value = selected.dataset.gender || '';
 });
 </script>
 
