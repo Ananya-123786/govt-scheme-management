@@ -15,15 +15,15 @@ if(isset($_POST['update_eligibility'])){
     $scheme_id = $_POST['scheme_id'];
     $min_age = $_POST['min_age'];
     $max_income = $_POST['max_income'];
-
+    $gender = $_POST['gender'];
     // Check if eligibility already exists
     $check = $conn->query("SELECT * FROM eligibility WHERE scheme_id=$scheme_id");
     if($check->num_rows > 0){
         // Update existing eligibility
-        $conn->query("UPDATE eligibility SET min_age=$min_age, max_income=$max_income WHERE scheme_id=$scheme_id");
+        $conn->query("UPDATE eligibility SET min_age=$min_age, max_income=$max_income, gender='$gender' WHERE scheme_id=$scheme_id");
     } else {
         // Insert new eligibility
-        $conn->query("INSERT INTO eligibility (scheme_id, min_age, max_income) VALUES ($scheme_id, $min_age, $max_income)");
+        $conn->query("INSERT INTO eligibility (scheme_id, min_age, max_income, gender) VALUES ($scheme_id, $min_age, $max_income, '$gender')");
     }
 
     $successMsg = "Eligibility criteria updated successfully!";
@@ -69,7 +69,12 @@ $schemes = $conn->query("SELECT * FROM schemes");
 
     <input type="number" name="min_age" id="min_age" placeholder="New Minimum Age" required>
     <input type="number" name="max_income" id="max_income" placeholder="New Maximum Income" required>
-
+<select name="gender" id="gender" required>
+    <option value="">Select Gender</option>
+    <option value="All">All</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+</select>
     <button type="submit" name="update_eligibility">Update Eligibility</button>
 </form>
 
@@ -94,6 +99,7 @@ schemeSelect.addEventListener('change', function() {
     .then(data => {
         document.getElementById('min_age').value = data.min_age || '';
         document.getElementById('max_income').value = data.max_income || '';
+        document.getElementById('gender').value = data.gender || '';
     });
 });
 </script>
