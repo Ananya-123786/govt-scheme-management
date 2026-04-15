@@ -16,7 +16,18 @@ if(isset($_POST['submit_application'])){
     $age_input = (int)$_POST['age'];
     $income_input = (float)$_POST['income'];
     $gender = $_POST['gender'];
+    $check = $conn->query("SELECT * FROM applications 
+WHERE scheme_id='$scheme_id' AND contact='$contact'");
 
+if($check->num_rows > 0){
+    echo "<script>alert('You have already applied for this scheme!');</script>";
+} else {
+    $conn->query("INSERT INTO applications 
+    (scheme_id, name, contact, age, income, gender) 
+    VALUES ('$scheme_id','$name','$contact','$age','$income','$gender')");
+    
+    echo "<script>alert('Application submitted successfully!');</script>";
+}
    $stmt = $conn->prepare("INSERT INTO applications 
     (scheme_id, name, contact, age, income, gender) 
     VALUES (?, ?, ?, ?, ?, ?)");
@@ -39,13 +50,15 @@ $schemes = [];
 if(isset($_POST['check'])){
     $age = (int)$_POST['age'];
     $income = (float)$_POST['income'];
-    
+    $gender = $_POST['gender'];
     // Correct query using JOIN with eligibility table
     $query = "
         SELECT s.*
         FROM schemes s
         JOIN eligibility e ON s.id = e.scheme_id
-        WHERE e.min_age <= $age AND e.max_income >= $income
+        WHERE e.min_age <= $age 
+        AND e.max_income >= $income
+        AND (e.gender = '$gender' OR e.gender = 'All')
         ORDER BY s.id ASC
     ";
     
@@ -118,12 +131,20 @@ if(isset($_POST['check'])){
 <p style="text-align:center; color: green;"><?php echo $loginMsg; ?></p>
 
 <a class="logout" href="logout.php">Logout</a>
+<a href="my_applications.php" style="display:block;text-align:center;background:#007BFF;color:white;padding:10px;border-radius:5px;margin:10px auto;width:200px;text-decoration:none;">My Applications</a>
 
+<a href="profile.php" style="display:block;text-align:center;background:#28a745;color:white;padding:10px;border-radius:5px;margin:10px auto;width:200px;text-decoration:none;">My Profile</a>
 <!-- Eligibility Check Form -->
 <div class="eligibility">
     <form method="POST">
         <input type="number" name="age" placeholder="Enter your age" value="<?php echo htmlspecialchars($age); ?>" required><br><br>
         <input type="number" name="income" placeholder="Enter your income" value="<?php echo htmlspecialchars($income); ?>" required><br><br>
+        <select name="gender" required>
+        <option value="">Select Gender</option>
+    <option value="">Any</option>
+    <option value="Male">Male</option>
+    <option value="Female">Female</option>
+</select>
         <button type="submit" name="check">Check Eligibility</button><br>
     </form>
 </div>
