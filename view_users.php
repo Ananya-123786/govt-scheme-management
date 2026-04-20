@@ -22,8 +22,13 @@ if(isset($_GET['reject'])){
     $msg = "Application rejected successfully!";
 }
 
-// Fetch all applications
-$applications = $conn->query("SELECT * FROM applications ORDER BY applied_date DESC");
+// ✅ FIX: JOIN with schemes table
+$applications = $conn->query("
+    SELECT a.*, s.scheme_name 
+    FROM applications a
+    JOIN schemes s ON a.scheme_id = s.id
+    ORDER BY applied_date DESC
+");
 ?>
 
 <!DOCTYPE html>
@@ -32,21 +37,92 @@ $applications = $conn->query("SELECT * FROM applications ORDER BY applied_date D
     <title>View Applications</title>
     <link rel="stylesheet" href="../style.css">
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; max-width: 1000px; margin: auto; background: #eef2f7; }
-        h2 { text-align: center; margin-bottom: 20px; color: #333; }
-        table { width: 100%; border-collapse: collapse; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #ddd; }
-        th { background-color: #007BFF; color: white; }
-        tr:hover { background-color: #f2f2f2; }
+        body { 
+    font-family: Arial, sans-serif; 
+    padding: 20px; 
+    max-width: 1200px;   /* 🔥 increased width */
+    margin: auto; 
+    background: #eef2f7; 
+}
 
-        button { padding: 6px 12px; border-radius: 5px; border: none; cursor: pointer; font-weight: bold; margin-right: 5px; }
-        button.approve { background-color: #28a745; color: white; }
-        button.approve:hover { background-color: #1e7e34; }
-        button.reject { background-color: #dc3545; color: white; }
-        button.reject:hover { opacity: 0.85; }
+h2 { 
+    text-align: center; 
+    margin-bottom: 20px; 
+    color: #333; 
+}
 
-        .back-btn { display: block; text-align: center; background-color: #007BFF; color: white; padding: 12px 18px; border-radius: 8px; text-decoration: none; font-weight: bold; margin: 20px auto 0 auto; width: 220px; }
-        .back-btn:hover { background-color: #0056b3; }
+table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    background: #fff; 
+    border-radius: 10px; 
+    overflow: hidden; 
+    box-shadow: 0 8px 20px rgba(0,0,0,0.1); 
+}
+
+th, td { 
+    padding: 14px;   /* 🔥 slightly bigger spacing */
+    text-align: left; 
+    border-bottom: 1px solid #ddd; 
+}
+
+th { 
+    background-color: #007BFF; 
+    color: white; 
+}
+
+tr:hover { 
+    background-color: #f2f2f2; 
+}
+
+/* 🔥 REMOVE RED BACKGROUND FROM LINKS */
+td a {
+    text-decoration: none;
+}
+
+/* Buttons clean */
+button { 
+    padding: 8px 14px; 
+    border-radius: 6px; 
+    border: none; 
+    cursor: pointer; 
+    font-weight: bold; 
+    margin-right: 5px; 
+}
+
+/* Approve */
+.approve {
+     background: green; color: white;
+     }
+
+/* Reject */
+.reject {
+     background: red; color: white; 
+    }
+
+
+/* Disabled buttons */
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.back-btn { 
+    display: block; 
+    text-align: center; 
+    background-color: #007BFF; 
+    color: white; 
+    padding: 12px 18px; 
+    border-radius: 8px; 
+    text-decoration: none; 
+    font-weight: bold; 
+    margin: 20px auto 0 auto; 
+    width: 220px; 
+}
+
+.back-btn:hover { 
+    background-color: #0056b3; 
+}
     </style>
 </head>
 <body>
@@ -60,6 +136,7 @@ $applications = $conn->query("SELECT * FROM applications ORDER BY applied_date D
 <table>
     <tr>
         <th>ID</th>
+        <th>Scheme</th> <!-- ✅ NEW -->
         <th>Name</th>
         <th>Contact</th>
         <th>Age</th>
@@ -73,6 +150,10 @@ $applications = $conn->query("SELECT * FROM applications ORDER BY applied_date D
     <?php while($app = $applications->fetch_assoc()): ?>
     <tr>
         <td><?php echo $app['id']; ?></td>
+
+        <!-- ✅ SHOW SCHEME NAME -->
+        <td><?php echo htmlspecialchars($app['scheme_name']); ?></td>
+
         <td><?php echo htmlspecialchars($app['name']); ?></td>
         <td><?php echo htmlspecialchars($app['contact']); ?></td>
         <td><?php echo $app['age']; ?></td>
@@ -80,16 +161,23 @@ $applications = $conn->query("SELECT * FROM applications ORDER BY applied_date D
         <td><?php echo $app['gender']; ?></td>
         <td><?php echo $app['applied_date']; ?></td>
         <td><?php echo $app['status'] ?? 'Pending'; ?></td>
+
         <td>
-            <?php 
-$status = $app['status'] ?? 'Pending';
-?>
-<a href="?approve=<?php echo $app['id']; ?>">
-    <button class="approve" <?php echo ($status != 'Pending') ? 'disabled style="opacity:0.6;cursor:not-allowed;"' : ''; ?>>Approve</button>
-</a>
-<a href="?reject=<?php echo $app['id']; ?>">
-    <button class="reject" <?php echo ($status != 'Pending') ? 'disabled style="opacity:0.6;cursor:not-allowed;"' : ''; ?>>Reject</button>
-</a>
+            <?php $status = $app['status'] ?? 'Pending'; ?>
+
+            <a href="?approve=<?php echo $app['id']; ?>">
+                <button class="approve" 
+                <?php echo ($status != 'Pending') ? 'disabled style="opacity:0.6;cursor:not-allowed;"' : ''; ?>>
+                    Approve
+                </button>
+            </a>
+
+            <a href="?reject=<?php echo $app['id']; ?>">
+                <button class="reject" 
+                <?php echo ($status != 'Pending') ? 'disabled style="opacity:0.6;cursor:not-allowed;"' : ''; ?>>
+                    Reject
+                </button>
+            </a>
         </td>
     </tr>
     <?php endwhile; ?>
