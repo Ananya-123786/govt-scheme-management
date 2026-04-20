@@ -111,6 +111,15 @@ if(isset($_POST['check'])){
             border-radius: 5px;
             width: 120px;
         }
+        .eligibility {
+    background: white;
+    padding: 25px;
+    border-radius: 10px;
+    width: 320px;
+    margin: 20px auto;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    text-align: center;
+}
     </style>
 </head>
 <body>
@@ -125,7 +134,7 @@ if(isset($_POST['check'])){
 </a>
 
 <!-- ================= SCHEMES ================= -->
-<h2>View Available Schemes</h2>
+<br><br><h2>View Available Schemes</h2>
 
 <div class="schemes">
 <?php if(count($schemes) > 0){ ?>
@@ -170,7 +179,7 @@ if(isset($_POST['check'])){
 </div>
 
 <!-- ================= ELIGIBILITY ================= -->
-<h2>Check Eligibility Criteria</h2>
+<br><br><h2>Check Eligibility Criteria</h2>
 
 <div class="eligibility">
     <form method="POST">
