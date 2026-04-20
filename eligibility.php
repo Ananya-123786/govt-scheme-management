@@ -12,23 +12,38 @@ $successMsg = "";
 
 // Update eligibility criteria
 if(isset($_POST['update_eligibility'])){
+
     $scheme_id = $_POST['scheme_id'];
     $min_age = $_POST['min_age'];
     $max_income = $_POST['max_income'];
     $gender = $_POST['gender'];
-    // Check if eligibility already exists
-    $check = $conn->query("SELECT * FROM eligibility WHERE scheme_id=$scheme_id");
-    if($check->num_rows > 0){
-        // Update existing eligibility
-        $conn->query("UPDATE eligibility SET min_age=$min_age, max_income=$max_income, gender='$gender' WHERE scheme_id=$scheme_id");
+
+    // 🔍 Get existing data
+    $old = $conn->query("
+        SELECT min_age, max_income, gender 
+        FROM eligibility 
+        WHERE scheme_id = $scheme_id
+    ")->fetch_assoc();
+
+    // 🧠 Check if no changes
+    if(
+        $old['min_age'] == $min_age &&
+        $old['max_income'] == $max_income &&
+        $old['gender'] == $gender
+    ){
+        echo "<script>alert('No changes were made');</script>";
     } else {
-        // Insert new eligibility
-        $conn->query("INSERT INTO eligibility (scheme_id, min_age, max_income, gender) VALUES ($scheme_id, $min_age, $max_income, '$gender')");
+
+        // ✅ Update only if changed
+        $conn->query("
+            UPDATE eligibility 
+            SET min_age=$min_age, max_income=$max_income, gender='$gender' 
+            WHERE scheme_id=$scheme_id
+        ");
+
+        echo "<script>alert('Eligibility updated successfully!');</script>";
     }
-
-    $successMsg = "Eligibility criteria updated successfully!";
 }
-
 // Fetch all schemes for dropdown
 $schemes = $conn->query("SELECT * FROM schemes");
 ?>
