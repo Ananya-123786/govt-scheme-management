@@ -9,17 +9,15 @@ if(!isset($_SESSION['username'])){
 }
 
 $username = $_SESSION['username'];
-
 // Get user contact
 $user = $conn->query("SELECT contact FROM users WHERE username='$username'")->fetch_assoc();
 $contact = $user['contact'];
-
 // Fetch applications
 $result = $conn->query("
     SELECT a.*, s.scheme_name 
     FROM applications a
     JOIN schemes s ON a.scheme_id = s.id
-    WHERE a.contact = '$contact'
+    WHERE a.name = '$username'
 ");
 ?>
 
@@ -74,7 +72,7 @@ $result = $conn->query("
 <?php while($row = $result->fetch_assoc()){ ?>
 <tr>
     <td><?php echo $row['scheme_name']; ?></td>
-    <td><?php echo $row['status']; ?></td>
+    <td><?php echo !empty($row['status']) ? $row['status'] : 'Pending'; ?></td>
     <td><?php echo $row['applied_date']; ?></td>
 </tr>
 <?php } ?>
