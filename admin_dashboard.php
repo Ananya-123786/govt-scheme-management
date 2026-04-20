@@ -67,7 +67,7 @@ if(!isset($_SESSION['admin_username'])){
 
     <div class="dashboard-buttons">
         <!-- 6.1.1 Add New Government Scheme -->
-        <a href="add_scheme.php"><button>Add Schemes</button></a>
+        <a href="add_scheme.php"><button>Manage Schemes</button></a>
         <!-- 6.1.2 Update Scheme Eligibility Criteria -->
         <a href="eligibility.php"><button>Update Eligibility Criteria</button></a>
 
