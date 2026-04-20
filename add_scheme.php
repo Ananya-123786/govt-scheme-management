@@ -12,40 +12,91 @@ $successMsg = "";
 
 // Add new scheme
 if(isset($_POST['add_scheme'])){
+
     $name = $_POST['scheme_name'];
     $details = $_POST['description'];
     $min_age = $_POST['min_age'];
     $max_income = $_POST['max_income'];
-$gender = $_POST['gender'];
-    $conn->query("INSERT INTO schemes (scheme_name,description) VALUES ('$name','$details')");
-    $scheme_id = $conn->insert_id;
+    $gender = $_POST['gender'];
 
-    $conn->query("INSERT INTO eligibility (scheme_id, min_age, max_income, gender) VALUES ($scheme_id, $min_age, $max_income, '$gender')");
-    $successMsg = "Scheme added successfully!";
+    // Check duplicate (case-insensitive)
+    $check = $conn->query("SELECT * FROM schemes WHERE LOWER(scheme_name)=LOWER('$name')");
+
+    if($check->num_rows > 0){
+
+        // ❌ Already exists
+        echo "<script>alert('Scheme already exists!');</script>";
+
+    } else {
+
+        // ✅ Insert into schemes
+        $conn->query("INSERT INTO schemes (scheme_name, description) VALUES ('$name','$details')");
+
+        // Get inserted ID
+        $scheme_id = $conn->insert_id;
+
+        // ✅ Insert into eligibility ONLY once
+        $conn->query("INSERT INTO eligibility (scheme_id, min_age, max_income, gender) 
+                      VALUES ($scheme_id, $min_age, $max_income, '$gender')");
+
+        echo "<script>alert('Scheme added successfully!');</script>";
+    }
 }
-
 // Update scheme
 if(isset($_POST['update_scheme'])){
+
     $id = $_POST['scheme_id'];
     $name = $_POST['update_name'];
     $details = $_POST['update_description'];
     $min_age = $_POST['update_min_age'];
     $max_income = $_POST['update_max_income'];
-$gender = $_POST['update_gender'];
-    $conn->query("UPDATE schemes SET scheme_name='$name', description='$details' WHERE id=$id");
-    $conn->query("UPDATE eligibility SET min_age=$min_age, max_income=$max_income, gender='$gender' WHERE scheme_id=$id");
+    $gender = $_POST['update_gender'];
 
-    $successMsg = "Scheme updated successfully!";
+    // 🔍 Fetch existing data
+    $old = $conn->query("
+        SELECT s.scheme_name, s.description, e.min_age, e.max_income, e.gender
+        FROM schemes s
+        LEFT JOIN eligibility e ON s.id = e.scheme_id
+        WHERE s.id = $id
+    ")->fetch_assoc();
+
+    // 🧠 Check if anything changed
+    if(
+        $old['scheme_name'] == $name &&
+        $old['description'] == $details &&
+        $old['min_age'] == $min_age &&
+        $old['max_income'] == $max_income &&
+        $old['gender'] == $gender
+    ){
+        echo "<script>alert('No changes were made');</script>";
+    } else {
+
+        // ✅ Perform update
+        $conn->query("UPDATE schemes 
+                      SET scheme_name='$name', description='$details' 
+                      WHERE id=$id");
+
+        $conn->query("UPDATE eligibility 
+                      SET min_age=$min_age, max_income=$max_income, gender='$gender' 
+                      WHERE scheme_id=$id");
+
+        echo "<script>alert('Scheme updated successfully');</script>";
+    }
 }
 
 // Delete scheme
-if(isset($_GET['delete'])){
+if(isset($_GET['delete']) && is_numeric($_GET['delete'])){
     $id = $_GET['delete'];
+
     $conn->query("DELETE FROM schemes WHERE id=$id");
     $conn->query("DELETE FROM eligibility WHERE scheme_id=$id");
-    $successMsg = "Scheme deleted successfully!";
-}
 
+    echo "<script>
+        alert('Scheme deleted successfully');
+        window.location='add_scheme.php';
+    </script>";
+    exit();
+}
 // Fetch all schemes
 $schemes = $conn->query("SELECT s.id, s.scheme_name, s.description, e.min_age, e.max_income, e.gender 
 FROM schemes s LEFT JOIN eligibility e ON s.id = e.scheme_id");
