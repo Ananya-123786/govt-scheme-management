@@ -41,8 +41,9 @@ if(isset($_POST['login'])){
     <input type="password" name="password" required><br>
     <button type="submit" name="login">Login</button>
 </form>
-<a class="register" href="register.php">Register Here</a>
+<a class="register" href="register.php">Create an account</a>
 </div>
 
 </body>
 </html>
+
