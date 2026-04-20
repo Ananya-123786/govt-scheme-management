@@ -51,7 +51,6 @@ $registrationSuccess = true;
 
 <label>Confirm Password</label>
 <input type="password" id="confirm_password" name="confirm_password" autocomplete="Confirm password" required>
-
 <label>Contact Number</label>
 <input type="text" id="contact" name="contact" required>
 
